@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>금융 시장 10년 모험</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F3F6F8;
+  --sheet: #FFFFFF;
+  --ink: #13324B;
+  --ink-soft: #4E6476;
+  --line: #D6E0E8;
+  --teal: #0F7C7A;
+  --teal-soft: #E1F2F1;
+  --amber: #B7791F;
+  --amber-soft: #FBF0DC;
+  --violet: #5B4FA0;
+  --violet-soft: #ECE9F7;
+  --up: #D23A3A;
+  --down: #2B62C4;
+  --stamp: #C8323C;
+  --btn: #13324B;
+  --btn-ink: #FFFFFF;
+  --shadow: 0 1px 0 rgba(19,50,75,.06);
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1A24; --sheet: #15242F; --ink: #E3ECF2; --ink-soft: #9AB0C0; --line: #2A3D4B;
+    --teal: #4FC2BE; --teal-soft: #173634; --amber: #E8B45A; --amber-soft: #3A2E17; --violet: #A99CF0; --violet-soft: #272442;
+    --up: #FF6B6B; --down: #6FA0FF; --stamp: #FF6B73; --btn: #E3ECF2; --btn-ink: #0E1A24; --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1A24; --sheet: #15242F; --ink: #E3ECF2; --ink-soft: #9AB0C0; --line: #2A3D4B;
+  --teal: #4FC2BE; --teal-soft: #173634; --amber: #E8B45A; --amber-soft: #3A2E17; --violet: #A99CF0; --violet-soft: #272442;
+  --up: #FF6B6B; --down: #6FA0FF; --stamp: #FF6B73; --btn: #E3ECF2; --btn-ink: #0E1A24; --shadow: none; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-size: 15px; line-height: 1.55; font-variant-numeric: tabular-nums;
+}
+.display { font-family: "Do Hyeon", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-weight: 400; letter-spacing: 0; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+/* top board */
+.board { background: var(--ink); color: var(--paper); padding: 18px 20px 16px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .board { background: #081118; } }
+:root[data-theme="dark"] .board { background: #081118; }
+.board-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.3fr 2fr; gap: 20px; align-items: end; }
+.board h1 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.05; }
+.board p { margin: 6px 0 0; color: #B9CBD8; font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+.stat { border-left: 2px solid rgba(255,255,255,.18); padding-left: 12px; }
+.stat .k { font-size: 12.5px; color: #B9CBD8; }
+.stat .v { font-size: clamp(22px, 2.6vw, 30px); line-height: 1.15; }
+.stat .s { font-size: 12.5px; }
+.pips { display: flex; gap: 3px; margin-top: 6px; }
+.pip { width: 100%; height: 6px; border-radius: 2px; background: rgba(255,255,255,.18); }
+.pip.done { background: #7FD6D2; }
+.pip.now { background: #FFD27A; }
+.up { color: var(--up); } .down { color: var(--down); }
+.board .up { color: #FF8C8C; } .board .down { color: #8FB6FF; }
+
+/* layout */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 18px 20px 120px; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; }
+.market { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; align-content: start; }
+.panel { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.panel.wide { grid-column: 1 / -1; }
+.panel h2 { margin: 0; font-size: 24px; line-height: 1.1; }
+.panel .lead { margin: 4px 0 10px; color: var(--ink-soft); font-size: 13.5px; }
+.tag-teal { border-top: 5px solid var(--teal); }
+.tag-amber { border-top: 5px solid var(--amber); }
+.tag-violet { border-top: 5px solid var(--violet); }
+.meters { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 12px; }
+.meter { display: flex; gap: 3px; align-items: center; }
+.meter i { width: 14px; height: 6px; border-radius: 2px; background: var(--line); display: inline-block; }
+.meter i.on { background: var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.field { display: flex; align-items: center; gap: 6px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
+.field input { width: 84px; border: 0; background: transparent; padding: 4px 0; text-align: right; }
+.field input:focus { outline: none; }
+.field:focus-within { outline: 3px solid var(--teal); outline-offset: 1px; }
+select { border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 7px 8px; }
+.btn { white-space: nowrap; flex-shrink: 0; border: 0; border-radius: 8px; padding: 8px 14px; background: var(--btn); color: var(--btn-ink); font-weight: 700; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+.btn.sell { background: var(--down); color: #fff; }
+.btn.buy { background: var(--up); color: #fff; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.holdings { margin-top: 12px; display: grid; gap: 6px; }
+.hold { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; background: var(--paper); font-size: 13.5px; }
+.hold small { color: var(--ink-soft); display: block; }
+.empty { color: var(--ink-soft); font-size: 13px; }
+.rates { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.rate-chip { font-size: 13px; padding: 3px 9px; border-radius: 999px; background: var(--teal-soft); color: var(--teal); font-weight: 700; }
+
+/* stocks */
+.stocks { width: 100%; border-collapse: collapse; font-size: 14px; }
+.stocks th { text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12.5px; padding: 0 6px 6px; border-bottom: 1px solid var(--line); }
+.stocks td { padding: 9px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.stocks td.num, .stocks th.num { text-align: right; }
+.co { font-weight: 700; }
+.co small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 12px; }
+.trade { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+.trade input { width: 56px; border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; background: var(--paper); text-align: right; }
+.scroll-x { overflow-x: auto; }
+
+/* passbook */
+.side { display: grid; gap: 14px; align-content: start; }
+.passbook { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.passbook header { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 10px; border-bottom: 2px solid var(--ink); }
+.passbook header h2 { margin: 0; font-size: 22px; }
+.passbook header span { font-size: 12.5px; color: var(--ink-soft); }
+.ledger { max-height: 420px; overflow-y: auto; font-size: 13px; }
+.ledger table { width: 100%; border-collapse: collapse; }
+.ledger th { white-space: nowrap; position: sticky; top: 0; background: var(--sheet); font-weight: 500; color: var(--ink-soft); font-size: 12px; text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+.ledger th:first-child, .ledger td:first-child { text-align: left; }
+.ledger td { padding: 6px 10px; border-bottom: 1px dashed var(--line); text-align: right; white-space: nowrap; }
+.ledger td:first-child { white-space: normal; }
+.ledger tr.yearline td { border-bottom: 1px solid var(--ink); background: var(--paper); font-weight: 700; text-align: left; }
+.chart-card { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.chart-card h2 { margin: 0 0 6px; font-size: 20px; }
+.legend { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-soft); }
+.legend b { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 4px; }
+svg text { font-family: inherit; }
+
+/* action bar */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--sheet); border-top: 1px solid var(--line); padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+.bar-inner { max-width: 1240px; margin: 0 auto; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.bar .hint { font-size: 13.5px; color: var(--ink-soft); }
+.bar .go { font-size: 22px; padding: 10px 26px; border-radius: 10px; }
+.bar .tools { display: flex; gap: 8px; }
+
+/* dialogs */
+dialog { border: 0; border-radius: 14px; padding: 0; max-width: min(640px, calc(100vw - 32px)); width: 100%; background: var(--sheet); color: var(--ink); }
+dialog::backdrop { background: rgba(8, 17, 24, .55); }
+.dlg { padding: 22px 24px 20px; }
+.dlg h2 { margin: 0 0 6px; font-size: 30px; line-height: 1.15; }
+.dlg p { margin: 6px 0; }
+.dlg ul { margin: 8px 0; padding-left: 20px; }
+.dlg li { margin: 3px 0; }
+.dlg .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.news-head { position: relative; padding: 20px 24px 16px; background: var(--ink); color: var(--paper); border-radius: 14px 14px 0 0; }
+.news-head .when { font-size: 13px; color: #B9CBD8; }
+.news-head h2 { font-size: clamp(26px, 4vw, 34px); margin: 4px 0 0; padding-right: 90px; }
+.stampmark { position: absolute; right: 18px; top: 16px; width: 76px; height: 76px; border: 3px solid var(--stamp); color: var(--stamp); border-radius: 50%; display: grid; place-items: center; font-size: 19px; transform: rotate(-12deg); background: rgba(255,255,255,.04); }
+.effects { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 12px 0; }
+.effect { background: var(--paper); border-radius: 8px; padding: 8px 10px; }
+.effect .k { font-size: 12.5px; color: var(--ink-soft); }
+.effect .v { font-size: 22px; line-height: 1.2; }
+.receipt { font-size: 14px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.receipt div { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+.lesson { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: var(--teal-soft); color: var(--ink); font-size: 14px; }
+.mode { display: grid; gap: 8px; margin-top: 12px; }
+.mode label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.mode label:has(input:checked) { border-color: var(--teal); background: var(--teal-soft); }
+.final-num { font-size: clamp(40px, 8vw, 64px); line-height: 1; margin: 6px 0 2px; }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+@media (max-width: 960px) {
+  .board-inner { grid-template-columns: 1fr; }
+  .wrap { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .market { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .bar .go { font-size: 19px; padding: 10px 18px; }
+  .bar .hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<section class="board" aria-label="현재 상태">
+  <div class="board-inner">
+    <div>
+      <h1 class="display">금융 시장 10년 모험</h1>
+      <p>1,000만 원으로 시작해 10년 동안 예금·적금·주식·채권을 사고팔아 보자.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">지금</div><div class="v display" id="sYear">1년 차</div><div class="pips" id="pips"></div></div>
+      <div class="stat"><div class="k">기준 금리</div><div class="v display" id="sRate">2.50%</div><div class="s" id="sRateChg">&nbsp;</div></div>
+      <div class="stat"><div class="k">현금</div><div class="v display" id="sCash">1,000만</div><div class="s">바로 쓸 수 있는 돈</div></div>
+      <div class="stat"><div class="k">총자산</div><div class="v display" id="sTotal">1,000만</div><div class="s" id="sProfit">&nbsp;</div></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="market">
+    <section class="panel tag-teal" aria-labelledby="hDep">
+      <h2 class="display" id="hDep">정기 예금</h2>
+      <p class="lead">목돈을 한 번에 맡기고, 만기가 되면 원금과 이자를 받아요. 중간에 깨면 이자를 거의 못 받아요.</p>
+      <div class="meters" id="mDep"></div>
+      <div class="rates" id="depRates"></div>
+      <div class="row">
+        <label class="field">금액 <input id="depAmt" type="number" min="10" step="10" value="300" inputmode="numeric" aria-label="정기 예금 금액(만 원)">만 원</label>
+        <select id="depTerm" aria-label="정기 예금 기간"></select>
+        <button class="btn" id="depBtn">가입하기</button>
+      </div>
+      <div class="holdings" id="depList"></div>
+    </section>
+
+    <section class="panel tag-teal" aria-labelledby="hSav">
+      <h2 class="display" id="hSav">정기 적금</h2>
+      <p class="lead">해마다 정한 금액을 꼬박꼬박 넣고 만기에 받아요. 넣을 현금이 모자라면 자동으로 해지돼요.</p>
+      <div class="meters" id="mSav"></div>
+      <div class="rates" id="savRates"></div>
+      <div class="row">
+        <label class="field">해마다 <input id="savAmt" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="해마다 넣을 금액(만 원)">만 원</label>
+        <select id="savTerm" aria-label="정기 적금 기간"></select>
+        <button class="btn" id="savBtn">가입하기</button>
+      </div>
+      <div class="holdings" id="savList"></div>
+    </section>
+
+    <section class="panel wide tag-violet" aria-labelledby="hStock">
+      <h2 class="display" id="hStock">주식</h2>
+      <p class="lead">싸게 사서 비싸게 팔면 시세 차익, 가지고 있으면 해마다 배당을 받아요. 언제든 사고팔 수 있어요.</p>
+      <div class="meters" id="mStock"></div>
+      <div class="scroll-x">
+        <table class="stocks">
+          <thead><tr><th>회사</th><th class="num">주가</th><th class="num">작년 대비</th><th class="num">내 주식</th><th class="num">평가액</th><th class="num">수익률</th><th class="num">사고팔기</th></tr></thead>
+          <tbody id="stockRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel wide tag-amber" aria-labelledby="hBond">
+      <h2 class="display" id="hBond">채권</h2>
+      <p class="lead">1장 = 100만 원. 해마다 약속한 이자를 받고 만기에 원금을 돌려받아요. 금리가 오르면 내 채권 값은 떨어지고, 금리가 내리면 올라요.</p>
+      <div class="meters" id="mBond"></div>
+      <div class="row" id="bondBuy"></div>
+      <div class="holdings" id="bondList"></div>
+    </section>
+  </div>
+
+  <div class="side">
+    <section class="chart-card" aria-labelledby="hChart">
+      <h2 class="display" id="hChart">내 자산 그래프</h2>
+      <div class="legend"><span><b style="background:var(--teal)"></b>총자산</span><span><b style="background:var(--ink-soft)"></b>지금까지 번 돈(원금)</span></div>
+      <div id="chart"></div>
+    </section>
+    <section class="passbook" aria-labelledby="hBook">
+      <header><h2 class="display" id="hBook">내 통장</h2><span>현금이 드나든 기록</span></header>
+      <div class="ledger" id="ledger"></div>
+    </section>
+  </div>
+</main>
+
+<div class="bar">
+  <div class="bar-inner">
+    <span class="hint" id="barHint">준비가 끝나면 1년을 보내고 뉴스를 확인하자.</span>
+    <div class="tools">
+      <button class="btn ghost" id="rulesBtn">규칙 보기</button>
+      <button class="btn ghost" id="resetBtn">처음부터</button>
+      <button class="btn go display" id="goBtn">1년 보내기</button>
+    </div>
+  </div>
+</div>
+
+<dialog id="dStart" aria-labelledby="startTitle">
+  <div class="dlg">
+    <h2 class="display" id="startTitle">게임 규칙</h2>
+    <ul>
+      <li>처음에 <b>1,000만 원</b>을 받고, 2년 차부터 해마다 초에 아르바이트 소득 <b>120만 원</b>이 들어와요.</li>
+      <li>한 해 동안 정기 예금·적금에 가입하거나 주식·채권을 사고팔 수 있어요.</li>
+      <li><b>1년 보내기</b>를 누르면 그해의 뉴스가 나오고 금리와 주가가 바뀌어요. 이자·배당·만기 금액은 통장에 자동으로 들어와요.</li>
+      <li>10년 차가 끝나면 모든 자산을 돈으로 계산해 최종 자산을 확인해요.</li>
+      <li>미래의 뉴스는 아무도 몰라요. 안전성·수익성·유동성을 생각하며 나눠 담아 보자!</li>
+    </ul>
+    <div class="mode" role="radiogroup" aria-label="시나리오">
+      <label><input type="radio" name="mode" value="fixed" checked><span><b>같은 뉴스로 하기</b><br><small>반 전체가 같은 10년을 겪어요. 끝나고 결과를 비교하기 좋아요.</small></span></label>
+      <label><input type="radio" name="mode" value="random"><span><b>뉴스 순서 섞기</b><br><small>뉴스가 나오는 순서가 매번 달라져요. 혼자 여러 번 해 볼 때 좋아요.</small></span></label>
+    </div>
+    <div class="actions"><button class="btn ghost" id="startClose">닫기</button><button class="btn display" id="startBtn" style="font-size:20px">새 게임 시작</button></div>
+  </div>
+</dialog>
+
+<dialog id="dNews" aria-labelledby="newsTitle">
+  <div class="news-head">
+    <div class="when" id="newsWhen"></div>
+    <h2 class="display" id="newsTitle"></h2>
+    <div class="stampmark display" aria-hidden="true">속보</div>
+  </div>
+  <div class="dlg">
+    <p id="newsBody"></p>
+    <div class="effects" id="newsEffects"></div>
+    <div class="receipt" id="newsReceipt"></div>
+    <div class="lesson" id="newsLesson"></div>
+    <div class="actions"><button class="btn display" id="newsOk" style="font-size:20px">확인</button></div>
+  </div>
+</dialog>
+
+<dialog id="dEnd" aria-labelledby="endTitle">
+  <div class="dlg">
+    <h2 class="display" id="endTitle">10년의 결과</h2>
+    <div class="final-num display" id="endTotal"></div>
+    <p id="endSub"></p>
+    <div class="receipt" id="endReceipt"></div>
+    <div class="lesson" id="endLesson"></div>
+    <div class="actions"><button class="btn ghost" id="endClose">기록 다시 보기</button><button class="btn display" id="endAgain" style="font-size:20px">다시 하기</button></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  const YEARS = 10, START_CASH = 1000, INCOME = 120;
+  const STOCKS = [
+    { id: "chip", name: "칩칩전자", sector: "반도체", price: 50000, div: 0.02 },
+    { id: "fly", name: "훨훨항공", sector: "항공", price: 20000, div: 0.01 },
+    { id: "green", name: "초록에너지", sector: "친환경 에너지", price: 10000, div: 0 },
+  ];
+  const BONDS = [
+    { id: "gov", name: "국채", by: "정부가 발행", spread: 0.5 },
+    { id: "corp", name: "튼튼건설 회사채", by: "기업이 발행 · 이자가 높은 대신 위험", spread: 2.5 },
+  ];
+  const EVENTS = [
+    { t: "반도체 수출 대박! 경제 호황", b: "기업 실적이 크게 늘고 소비도 살아났다. 한국은행은 기준 금리를 그대로 두었다.", rate: 2.5, chg: { chip: 35, fly: 12, green: 5 }, lesson: "경기가 좋을 때는 주식의 수익성이 돋보여요." },
+    { t: "물가 상승! 한국은행, 기준 금리 인상", b: "물가를 잡기 위해 기준 금리를 3.50%로 올렸다. 예금 금리도 따라 오른다.", rate: 3.5, chg: { chip: -12, fly: -15, green: -10 }, lesson: "금리가 오르면 예금의 매력은 커지고, 주식 시장과 이미 산 채권 값은 대체로 떨어져요." },
+    { t: "감염병 세계적 유행! 하늘길이 막혔다", b: "항공·여행 업계는 큰 타격을 입었고, 경기를 살리려 기준 금리를 1.50%로 내렸다.", rate: 1.5, chg: { chip: 18, fly: -55, green: 8 }, lesson: "같은 사건이라도 업종마다 영향이 달라요. 한 회사에 몰빵하면 위험해요." },
+    { t: "경기 부양책! 주식 시장 반등", b: "정부가 돈을 풀고 기준 금리를 1.00%까지 내리자 주가가 크게 올랐다.", rate: 1.0, chg: { chip: 25, fly: 35, green: 40 }, lesson: "금리가 내리면 주식의 상대적 매력이 커지고, 이미 가진 채권 값은 올라가요." },
+    { t: "탄소 중립 정책 대폭 강화", b: "기후위기 대응을 위해 친환경 에너지 산업 지원이 크게 늘었다.", rate: 1.25, chg: { chip: 5, fly: 10, green: 50 }, lesson: "기후위기 같은 사회 변화도 투자 수익률을 바꿔요." },
+    { t: "인플레이션 심화, 금리 급등", b: "물가가 계속 오르자 한국은행이 기준 금리를 3.00%까지 빠르게 올렸다.", rate: 3.0, chg: { chip: -18, fly: -10, green: -25 }, lesson: "금리가 급하게 오르면 주식과 채권 값이 함께 흔들릴 수 있어요." },
+    { t: "튼튼건설 부도! 회사채 투자자 비상", b: "튼튼건설이 돈을 갚지 못하게 되었다. 회사채를 가진 사람은 원금의 절반만 돌려받는다.", rate: 3.0, chg: { chip: -5, fly: 5, green: -5 }, corpDefault: true, lesson: "채권도 발행한 곳이 파산하면 돈을 잃을 수 있어요. 돈을 갚을 능력을 꼭 확인!" },
+    { t: "해외여행 수요 폭발", b: "감염병이 끝나고 여행객이 쏟아지면서 항공사 실적이 급증했다.", rate: 2.75, chg: { chip: 10, fly: 45, green: 5 }, lesson: "크게 떨어졌던 주식이 다시 오르기도 해요. 그래서 주식은 예측이 어려워요." },
+    { t: "칩칩전자 공장 화재… 대규모 리콜", b: "핵심 공장에 불이 나고 불량 제품을 거둬들이면서 주가가 폭락했다.", rate: 2.5, chg: { chip: -45, fly: 5, green: 10 }, lesson: "한 기업에만 투자했다면 한 번의 사고로 큰 손실! 달걀은 여러 바구니에." },
+    { t: "경제 안정, 금리 소폭 인하", b: "물가가 안정되자 기준 금리를 2.25%로 조금 내렸다. 주식 시장도 차분히 올랐다.", rate: 2.25, chg: { chip: 20, fly: 6, green: 12 }, lesson: "정치·경제가 안정되면 수익성 위주의 투자도 해 볼 만해요." },
+  ];
+  const BREAK_SHARE = 0.2; // 중도 해지 시 받는 이자 비율
+  const DEFAULT_RECOVERY = 0.5;
+
+  const $ = id => document.getElementById(id);
+  const won = m => (Math.round(m * 10) / 10).toLocaleString("ko-KR", { maximumFractionDigits: 1 }) + "만 원";
+  const wonShort = m => (Math.round(m * 10) / 10).toLocaleString("ko-KR", { maximumFractionDigits: 1 }) + "만";
+  const pct = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v * 10) / 10) + "%";
+  const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+  const sign = m => (m > 0 ? "+" : m < 0 ? "−" : "") + won(Math.abs(m));
+
+  let S, uid = 1;
+
+  function fresh(mode) {
+    const order = EVENTS.map((_, i) => i);
+    if (mode === "random") for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    return {
+      mode, order, year: 1, rate: 2.5, prevRate: 2.5, cash: START_CASH, contributed: START_CASH,
+      deposits: [], savings: [], bonds: [],
+      stocks: Object.fromEntries(STOCKS.map(s => [s.id, { shares: 0, cost: 0 }])),
+      prices: Object.fromEntries(STOCKS.map(s => [s.id, s.price])),
+      lastChg: Object.fromEntries(STOCKS.map(s => [s.id, 0])),
+      corpOpen: true, history: [{ y: 0, total: START_CASH, contributed: START_CASH }],
+      log: [{ y: 1, memo: "게임 시작 · 처음 받은 돈", in: START_CASH, out: 0, bal: START_CASH }],
+      stats: { interest: 0, dividends: 0, coupons: 0, stockGain: 0, bondGain: 0, breaks: 0, breakLost: 0, defaultLoss: 0, autoCancel: 0 },
+      done: false, started: false,
+    };
+  }
+
+  function save() { try { localStorage.setItem("finance-game-v1", JSON.stringify({ S, uid })); } catch (e) {} }
+  function load() {
+    try { const raw = localStorage.getItem("finance-game-v1"); if (!raw) return false; const d = JSON.parse(raw); if (!d || !d.S) return false; S = d.S; uid = d.uid || 1; return true; } catch (e) { return false; }
+  }
+
+  const left = () => YEARS - S.year + 1; // years remaining including this one
+  const depRate = term => S.rate + 1.0 + (term - 1) * 0.2;
+  const savRate = term => S.rate + 1.4 + (term - 2) * 0.2;
+  const bondCoupon = b => S.rate + b.spread;
+
+  function addLog(memo, amtIn, amtOut) { S.log.push({ y: S.year, memo, in: amtIn || 0, out: amtOut || 0, bal: S.cash }); }
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200); }
+
+  // valuations
+  const stockValue = id => S.stocks[id].shares * S.prices[id] / 10000;
+  function bondPrice(h) {
+    const spec = BONDS.find(b => b.id === h.type);
+    const remain = h.start + h.term - S.year; // full years left after this year's turn starts
+    const market = S.rate + spec.spread;
+    const p = 100 * (1 + (h.coupon - market) / 100 * Math.max(remain, 0));
+    return Math.max(40, Math.round(p * 10) / 10);
+  }
+  const depAccrued = d => d.principal * d.rate / 100 * (S.year - d.start);
+  function savSum(sv) { return sv.yearly * sv.paid; }
+  function savAccrued(sv) { let t = 0; for (let k = 0; k < sv.paid; k++) t += sv.yearly * sv.rate / 100 * (S.year - (sv.start + k)); return t; }
+  function total() {
+    let t = S.cash;
+    S.deposits.forEach(d => t += d.principal + depAccrued(d));
+    S.savings.forEach(sv => t += savSum(sv) + savAccrued(sv));
+    STOCKS.forEach(s => t += stockValue(s.id));
+    S.bonds.forEach(h => t += h.units * bondPrice(h));
+    return t;
+  }
+
+  // actions
+  function joinDeposit() {
+    const amt = Math.floor(Number($("depAmt").value)); const term = Number($("depTerm").value);
+    if (!(amt >= 10)) return toast("10만 원 이상 넣어 주세요.");
+    if (amt > S.cash) return toast("현금이 모자라요. 지금 현금은 " + won(S.cash) + "이에요.");
+    S.cash -= amt;
+    const r = depRate(term);
+    S.deposits.push({ id: uid++, principal: amt, rate: r, term, start: S.year });
+    addLog(`정기 예금 가입 (${term}년, 연 ${r.toFixed(2)}%)`, 0, amt);
+    toast(`정기 예금에 ${won(amt)} 가입! 만기는 ${S.year + term - 1}년 차 끝이에요.`);
+    render();
+  }
+  function breakDeposit(id) {
+    const d = S.deposits.find(x => x.id === id); if (!d) return;
+    const full = depAccrued(d), got = full * BREAK_SHARE;
+    if (!confirm(`지금 깨면 이자 ${won(full)} 중 ${won(got)}만 받아요. 해지할까요?`)) return;
+    S.cash += d.principal + got; S.stats.interest += got; S.stats.breaks++; S.stats.breakLost += full - got;
+    S.deposits = S.deposits.filter(x => x.id !== id);
+    addLog("정기 예금 중도 해지", d.principal + got, 0);
+    render();
+  }
+  function joinSaving() {
+    const amt = Math.floor(Number($("savAmt").value)); const term = Number($("savTerm").value);
+    if (!(amt >= 10)) return toast("10만 원 이상 넣어 주세요.");
+    if (amt > S.cash) return toast("첫 납입금이 모자라요. 지금 현금은 " + won(S.cash) + "이에요.");
+    S.cash -= amt;
+    const r = savRate(term);
+    S.savings.push({ id: uid++, yearly: amt, rate: r, term, start: S.year, paid: 1 });
+    addLog(`정기 적금 가입 · 1회차 납입 (${term}년, 연 ${r.toFixed(2)}%)`, 0, amt);
+    toast(`적금 가입! 해마다 초에 ${won(amt)}씩 자동으로 빠져나가요.`);
+    render();
+  }
+  function cancelSaving(id, auto) {
+    const sv = S.savings.find(x => x.id === id); if (!sv) return;
+    const full = savAccrued(sv), got = full * BREAK_SHARE;
+    if (!auto && !confirm(`지금 깨면 이자 ${won(full)} 중 ${won(got)}만 받아요. 해지할까요?`)) return;
+    S.cash += savSum(sv) + got; S.stats.interest += got; S.stats.breaks++; S.stats.breakLost += full - got;
+    if (auto) S.stats.autoCancel++;
+    S.savings = S.savings.filter(x => x.id !== id);
+    addLog(auto ? "정기 적금 자동 해지 (납입금 부족)" : "정기 적금 중도 해지", savSum(sv) + got, 0);
+    if (!auto) render();
+  }
+  function trade(id, dir) {
+    const inp = $("q-" + id); const q = Math.floor(Number(inp.value));
+    if (!(q >= 1)) return toast("몇 주를 사고팔지 1 이상으로 적어 주세요.");
+    const s = STOCKS.find(x => x.id === id), h = S.stocks[id], price = S.prices[id] / 10000;
+    if (dir === "buy") {
+      const cost = q * price;
+      if (cost > S.cash + 1e-9) return toast(`현금이 모자라요. 최대 ${Math.floor(S.cash / price)}주까지 살 수 있어요.`);
+      S.cash -= cost; h.cost += cost; h.shares += q;
+      addLog(`${s.name} ${q}주 매수`, 0, cost);
+    } else {
+      if (q > h.shares) return toast(`가진 주식은 ${h.shares}주예요.`);
+      const avg = h.cost / h.shares, proceeds = q * price, gain = proceeds - avg * q;
+      S.cash += proceeds; h.cost -= avg * q; h.shares -= q; S.stats.stockGain += gain;
+      addLog(`${s.name} ${q}주 매도 (시세 차익 ${sign(gain)})`, proceeds, 0);
+    }
+    render();
+  }
+  function buyBond(type) {
+    const inp = $("bq-" + type); const q = Math.floor(Number(inp.value));
+    if (!(q >= 1)) return toast("1장 이상 적어 주세요.");
+    if (q * 100 > S.cash) return toast(`현금이 모자라요. 최대 ${Math.floor(S.cash / 100)}장까지 살 수 있어요.`);
+    const spec = BONDS.find(b => b.id === type), term = Math.min(3, left());
+    S.cash -= q * 100;
+    S.bonds.push({ id: uid++, type, units: q, coupon: bondCoupon(spec), term, start: S.year, cost: 100 });
+    addLog(`${spec.name} ${q}장 매수 (연 ${bondCoupon(spec).toFixed(2)}%, ${term}년)`, 0, q * 100);
+    render();
+  }
+  function sellBond(id) {
+    const h = S.bonds.find(x => x.id === id); if (!h) return;
+    const spec = BONDS.find(b => b.id === h.type), p = bondPrice(h), proceeds = p * h.units, gain = (p - h.cost) * h.units;
+    if (!confirm(`지금 시세는 1장당 ${won(p)}이에요. ${h.units}장을 팔면 ${won(proceeds)} (시세 차익 ${sign(gain)}). 팔까요?`)) return;
+    S.cash += proceeds; S.stats.bondGain += gain;
+    S.bonds = S.bonds.filter(x => x.id !== id);
+    addLog(`${spec.name} ${h.units}장 매도 (시세 차익 ${sign(gain)})`, proceeds, 0);
+    render();
+  }
+
+  // year advance
+  function advance() {
+    if (S.done) return showEnd();
+    const ev = EVENTS[S.order[S.year - 1]];
+    const before = total();
+    const rec = [];
+    S.stats.cashShares = (S.stats.cashShares || []).concat(S.cash / before);
+    STOCKS.forEach(s => { const sh = stockValue(s.id) / before; if (sh > (S.stats.peakShare || 0)) { S.stats.peakShare = sh; S.stats.peakName = s.name; } });
+    S.prevRate = S.rate;
+    // stocks
+    STOCKS.forEach(s => { S.prices[s.id] = Math.max(500, Math.round(S.prices[s.id] * (1 + ev.chg[s.id] / 100) / 100) * 100); S.lastChg[s.id] = ev.chg[s.id]; });
+    let divs = 0;
+    STOCKS.forEach(s => { const d = stockValue(s.id) * s.div; if (d > 0) { divs += d; } });
+    if (divs > 0) { S.cash += divs; S.stats.dividends += divs; addLog("주식 배당금", divs, 0); rec.push(["주식 배당금", divs]); }
+    // bonds: coupons, defaults, maturities
+    S.bonds.slice().forEach(h => {
+      const spec = BONDS.find(b => b.id === h.type);
+      if (ev.corpDefault && h.type === "corp") {
+        const back = h.units * 100 * DEFAULT_RECOVERY;
+        S.cash += back; S.stats.defaultLoss += h.units * h.cost - back;
+        S.bonds = S.bonds.filter(x => x.id !== h.id);
+        addLog("튼튼건설 회사채 부도 (원금 절반 회수)", back, 0); rec.push(["회사채 부도로 돌려받은 돈", back]);
+        return;
+      }
+      const c = h.units * 100 * h.coupon / 100;
+      S.cash += c; S.stats.coupons += c; addLog(`${spec.name} 이자`, c, 0); rec.push([`${spec.name} 이자`, c]);
+      if (h.start + h.term - 1 === S.year) {
+        const back = h.units * 100; S.cash += back; S.stats.bondGain += (100 - h.cost) * h.units;
+        S.bonds = S.bonds.filter(x => x.id !== h.id);
+        addLog(`${spec.name} 만기 원금`, back, 0); rec.push([`${spec.name} 만기 원금`, back]);
+      }
+    });
+    if (ev.corpDefault) S.corpOpen = false;
+    // deposits
+    S.deposits.slice().forEach(d => {
+      if (d.start + d.term - 1 === S.year) {
+        const intr = d.principal * d.rate / 100 * d.term;
+        S.cash += d.principal + intr; S.stats.interest += intr;
+        S.deposits = S.deposits.filter(x => x.id !== d.id);
+        addLog(`정기 예금 만기 (이자 ${won(intr)})`, d.principal + intr, 0); rec.push(["정기 예금 만기", d.principal + intr]);
+      }
+    });
+    // savings maturity (interest to end of this year)
+    S.savings.slice().forEach(sv => {
+      if (sv.start + sv.term - 1 === S.year) {
+        let intr = 0; for (let k = 0; k < sv.paid; k++) intr += sv.yearly * sv.rate / 100 * (S.year - (sv.start + k) + 1);
+        S.cash += savSum(sv) + intr; S.stats.interest += intr;
+        S.savings = S.savings.filter(x => x.id !== sv.id);
+        addLog(`정기 적금 만기 (이자 ${won(intr)})`, savSum(sv) + intr, 0); rec.push(["정기 적금 만기", savSum(sv) + intr]);
+      }
+    });
+    S.rate = ev.rate;
+    const finishedYear = S.year;
+    // next year
+    if (S.year < YEARS) {
+      S.year++;
+      S.cash += INCOME; S.contributed += INCOME;
+      addLog("아르바이트 소득", INCOME, 0); rec.push(["새해 아르바이트 소득", INCOME]);
+      S.savings.slice().forEach(sv => {
+        if (sv.paid < sv.term) {
+          if (S.cash >= sv.yearly) { S.cash -= sv.yearly; sv.paid++; addLog(`정기 적금 ${sv.paid}회차 납입`, 0, sv.yearly); rec.push([`적금 ${sv.paid}회차 납입`, -sv.yearly]); }
+          else { cancelSaving(sv.id, true); rec.push(["현금 부족으로 적금 자동 해지", 0]); }
+        }
+      });
+    } else {
+      S.done = true;
+    }
+    const after = total();
+    S.history.push({ y: finishedYear, total: after, contributed: S.contributed });
+    save(); render();
+    showNews(ev, finishedYear, before, after, rec);
+  }
+
+  function showNews(ev, y, before, after, rec) {
+    $("newsWhen").textContent = `${y}년 차 연말 뉴스`;
+    $("newsTitle").textContent = ev.t;
+    $("newsBody").textContent = ev.b;
+    const rateD = S.rate - S.prevRate;
+    const eff = [["기준 금리", S.rate.toFixed(2) + "%", rateD === 0 ? "동결" : (rateD > 0 ? "▲ " : "▼ ") + Math.abs(rateD).toFixed(2) + "%p", cls(rateD)]];
+    STOCKS.forEach(s => eff.push([s.name, pct(ev.chg[s.id]), S.prices[s.id].toLocaleString("ko-KR") + "원", cls(ev.chg[s.id])]));
+    $("newsEffects").innerHTML = eff.map(([k, v, sub, c]) => `<div class="effect"><div class="k">${k}</div><div class="v display ${c}">${v}</div><div class="k">${sub}</div></div>`).join("");
+    const diff = after - before - (S.done ? 0 : INCOME);
+    $("newsReceipt").innerHTML = rec.map(([k, v]) => `<div><span>${k}</span><span class="${cls(v)}">${v === 0 ? "" : sign(v)}</span></div>`).join("") +
+      `<div style="font-weight:700;border-top:1px solid var(--line);margin-top:4px;padding-top:6px"><span>올해 투자로 늘어난 자산 (소득 제외)</span><span class="${cls(diff)}">${sign(diff)}</span></div>`;
+    $("newsLesson").textContent = ev.lesson;
+    $("newsOk").textContent = S.done ? "최종 결과 보기" : `${S.year}년 차 시작`;
+    $("dNews").showModal();
+  }
+
+  function showEnd() {
+    // settle unmatured holdings at end-of-game value
+    const t = total();
+    const profit = t - S.contributed;
+    $("endTotal").textContent = won(t);
+    $("endTotal").className = "final-num display " + cls(profit);
+    $("endSub").innerHTML = `넣은 돈 ${won(S.contributed)} (처음 1,000만 원 + 소득 ${won(S.contributed - START_CASH)}) → 번 돈 <b class="${cls(profit)}">${sign(profit)}</b> (${pct(profit / S.contributed * 100)})`;
+    const st = S.stats;
+    const unreal = STOCKS.reduce((a, s) => a + stockValue(s.id) - S.stocks[s.id].cost, 0);
+    const rows = [
+      ["예금·적금 이자", st.interest], ["주식 배당금", st.dividends], ["주식 시세 차익 (판 것)", st.stockGain], ["주식 평가 손익 (아직 가진 것)", unreal],
+      ["채권 이자", st.coupons], ["채권 시세 차익", st.bondGain], ["회사채 부도 손실", -st.defaultLoss], ["중도 해지로 놓친 이자", -st.breakLost],
+    ];
+    $("endReceipt").innerHTML = rows.map(([k, v]) => `<div><span>${k}</span><span class="${cls(v)}">${sign(v)}</span></div>`).join("");
+    const tips = [];
+    if ((st.peakShare || 0) > 0.5) tips.push(`한때 자산의 ${Math.round(st.peakShare * 100)}%를 ${st.peakName} 한 회사에 담았어요. 수익성은 높을 수 있지만 안전성이 낮아요.`);
+    const cs = st.cashShares || [];
+    if (cs.length && cs.reduce((a, b) => a + b, 0) / cs.length > 0.6) tips.push("10년 동안 돈의 대부분을 현금으로 두었어요. 유동성은 높지만 수익성이 아쉬워요.");
+    if (st.breaks > 0) tips.push(`예금·적금을 ${st.breaks}번 중간에 깨서 이자 ${won(st.breakLost)}를 놓쳤어요. 예금은 만기 전에는 유동성이 낮아요.`);
+    if (st.autoCancel > 0) tips.push("현금이 모자라 적금이 자동 해지된 적이 있어요. 쓸 돈(유동성)을 남겨 두는 것도 자산 관리예요.");
+    if (st.defaultLoss > 0) tips.push(`회사채 부도로 ${won(st.defaultLoss)}를 잃었어요. 채권도 발행한 곳의 안전성을 따져야 해요.`);
+    if (!tips.length) tips.push("여러 바구니에 고르게 나눠 담았네요! 수익성·안전성·유동성의 균형을 잘 잡았어요.");
+    $("endLesson").innerHTML = tips.map(x => "· " + x).join("<br>");
+    $("dEnd").showModal();
+  }
+
+  // rendering
+  function meters(el, rows) {
+    el.innerHTML = rows.map(([k, n]) => `<span>${k}</span><span class="meter" aria-label="${k} ${n}점 / 5점">${[1, 2, 3, 4, 5].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</span>`).join("");
+  }
+
+  function render() {
+    // board
+    $("sYear").textContent = S.done ? "10년 끝" : `${S.year}년 차`;
+    $("pips").innerHTML = Array.from({ length: YEARS }, (_, i) => `<span class="pip ${i + 1 < S.year || S.done ? "done" : i + 1 === S.year ? "now" : ""}"></span>`).join("");
+    $("sRate").textContent = S.rate.toFixed(2) + "%";
+    const rd = S.rate - S.prevRate;
+    $("sRateChg").innerHTML = rd === 0 ? "작년과 같음" : `<span class="${cls(rd)}">${rd > 0 ? "▲" : "▼"} ${Math.abs(rd).toFixed(2)}%p</span>`;
+    $("sCash").textContent = wonShort(S.cash);
+    const t = total(), p = t - S.contributed;
+    $("sTotal").textContent = wonShort(t);
+    $("sProfit").innerHTML = `<span class="${cls(p)}">번 돈 ${sign(p)}</span>`;
+
+    // deposits
+    const lt = left();
+    const depTerms = [1, 2, 3].filter(n => n <= lt);
+    $("depRates").innerHTML = depTerms.map(n => `<span class="rate-chip">${n}년 연 ${depRate(n).toFixed(2)}%</span>`).join("");
+    const curDep = $("depTerm").value;
+    $("depTerm").innerHTML = depTerms.map(n => `<option value="${n}">${n}년</option>`).join("");
+    if (depTerms.includes(Number(curDep))) $("depTerm").value = curDep;
+    $("depBtn").disabled = S.done || !depTerms.length;
+    $("depList").innerHTML = S.deposits.length ? S.deposits.map(d => {
+      const at = d.principal * (1 + d.rate / 100 * d.term);
+      return `<div class="hold"><div><b>${won(d.principal)}</b> · 연 ${d.rate.toFixed(2)}% · ${d.term}년<small>${d.start + d.term - 1}년 차 끝 만기 → ${won(at)} 받음</small></div><button class="btn ghost" data-break="${d.id}" ${S.done ? "disabled" : ""}>중도 해지</button></div>`;
+    }).join("") : `<div class="empty">가입한 정기 예금이 없어요.</div>`;
+
+    // savings
+    const savTerms = [2, 3].filter(n => n <= lt);
+    $("savRates").innerHTML = savTerms.length ? savTerms.map(n => `<span class="rate-chip">${n}년 연 ${savRate(n).toFixed(2)}%</span>`).join("") : `<span class="empty">남은 기간이 짧아 새로 가입할 수 없어요.</span>`;
+    const curSav = $("savTerm").value;
+    $("savTerm").innerHTML = savTerms.map(n => `<option value="${n}">${n}년</option>`).join("");
+    if (savTerms.includes(Number(curSav))) $("savTerm").value = curSav;
+    $("savBtn").disabled = S.done || !savTerms.length;
+    $("savList").innerHTML = S.savings.length ? S.savings.map(sv => `<div class="hold"><div><b>해마다 ${won(sv.yearly)}</b> · 연 ${sv.rate.toFixed(2)}% · ${sv.term}년<small>${sv.paid}/${sv.term}회 납입 · 지금까지 ${won(savSum(sv))} · ${sv.start + sv.term - 1}년 차 끝 만기</small></div><button class="btn ghost" data-cancel="${sv.id}" ${S.done ? "disabled" : ""}>중도 해지</button></div>`).join("") : `<div class="empty">가입한 정기 적금이 없어요.</div>`;
+
+    // stocks
+    $("stockRows").innerHTML = STOCKS.map(s => {
+      const h = S.stocks[s.id], v = stockValue(s.id), r = h.cost > 0 ? (v - h.cost) / h.cost * 100 : 0, c = S.lastChg[s.id];
+      return `<tr><td class="co">${s.name}<small>${s.sector}${s.div ? ` · 배당 연 ${s.div * 100}%` : " · 배당 없음"}</small></td>
+        <td class="num"><b>${S.prices[s.id].toLocaleString("ko-KR")}원</b></td>
+        <td class="num ${cls(c)}">${c ? pct(c) : "−"}</td>
+        <td class="num">${h.shares.toLocaleString("ko-KR")}주</td>
+        <td class="num">${won(v)}</td>
+        <td class="num ${cls(r)}">${h.shares ? pct(r) : "−"}</td>
+        <td class="num"><div class="trade"><input id="q-${s.id}" type="number" min="1" value="${s.price >= 50000 ? 20 : 50}" inputmode="numeric" aria-label="${s.name} 주식 수"><button class="btn buy" data-buy="${s.id}" ${S.done ? "disabled" : ""}>사기</button><button class="btn sell" data-sell="${s.id}" ${S.done ? "disabled" : ""}>팔기</button></div></td></tr>`;
+    }).join("");
+
+    // bonds
+    const bt = Math.min(3, lt);
+    $("bondBuy").innerHTML = BONDS.map(b => {
+      const open = b.id !== "corp" || S.corpOpen;
+      return `<div class="hold" style="flex:1 1 260px"><div><b>${b.name}</b> · ${open ? `연 ${bondCoupon(b).toFixed(2)}% · ${bt}년 만기` : "부도로 거래 중지"}<small>${b.by}</small></div>
+        <div class="trade"><input id="bq-${b.id}" type="number" min="1" value="2" inputmode="numeric" aria-label="${b.name} 장수" ${open ? "" : "disabled"}><button class="btn" data-bond="${b.id}" ${open && !S.done ? "" : "disabled"}>사기</button></div></div>`;
+    }).join("");
+    $("bondList").innerHTML = S.bonds.length ? S.bonds.map(h => {
+      const spec = BONDS.find(b => b.id === h.type), p = bondPrice(h), g = (p - h.cost) * h.units;
+      return `<div class="hold"><div><b>${spec.name} ${h.units}장</b> · 연 ${h.coupon.toFixed(2)}%<small>${h.start + h.term - 1}년 차 끝 만기 · 지금 시세 1장당 ${won(p)} (<span class="${cls(g)}">${sign(g)}</span>)</small></div><button class="btn sell" data-bsell="${h.id}" ${S.done ? "disabled" : ""}>팔기</button></div>`;
+    }).join("") : `<div class="empty">가진 채권이 없어요.</div>`;
+
+    renderLedger(); renderChart();
+    $("goBtn").textContent = S.done ? "최종 결과 보기" : (S.year === YEARS ? "마지막 해 보내기" : "1년 보내기");
+    $("barHint").textContent = S.done ? "10년이 끝났어요. 최종 결과를 확인하자." : `${S.year}년 차 · 준비가 끝나면 1년을 보내고 뉴스를 확인하자.`;
+    save();
+  }
+
+  function renderLedger() {
+    let html = `<table><thead><tr><th>내용</th><th>찾은 돈</th><th>넣은 돈</th><th>현금 잔액</th></tr></thead><tbody>`;
+    let lastY = 0;
+    const rows = S.log.slice().reverse();
+    rows.forEach(r => {
+      if (r.y !== lastY) { html += `<tr class="yearline"><td colspan="4">${r.y}년 차</td></tr>`; lastY = r.y; }
+      html += `<tr><td>${r.memo}</td><td class="down">${r.out ? wonShort(r.out) : ""}</td><td class="up">${r.in ? wonShort(r.in) : ""}</td><td>${wonShort(r.bal)}</td></tr>`;
+    });
+    $("ledger").innerHTML = html + "</tbody></table>";
+  }
+
+  function renderChart() {
+    const W = 460, H = 220, P = { l: 48, r: 12, t: 12, b: 26 };
+    const pts = S.history.slice();
+    const cur = { y: S.done ? YEARS : S.year - 1 + 0.5, total: total(), contributed: S.contributed };
+    const data = S.done ? pts : pts.concat([cur]);
+    const maxV = Math.max(...data.map(d => Math.max(d.total, d.contributed))) * 1.1;
+    const minV = Math.min(...data.map(d => Math.min(d.total, d.contributed))) * 0.85;
+    const x = y => P.l + (W - P.l - P.r) * (y / YEARS);
+    const yv = v => P.t + (H - P.t - P.b) * (1 - (v - minV) / (maxV - minV || 1));
+    const line = (key) => data.map((d, i) => `${i ? "L" : "M"}${x(d.y).toFixed(1)},${yv(d[key]).toFixed(1)}`).join(" ");
+    let grid = "";
+    for (let i = 0; i <= 3; i++) { const v = minV + (maxV - minV) * i / 3; grid += `<line x1="${P.l}" x2="${W - P.r}" y1="${yv(v)}" y2="${yv(v)}" stroke="var(--line)"/><text x="${P.l - 6}" y="${yv(v) + 4}" font-size="11" text-anchor="end" fill="var(--ink-soft)">${Math.round(v).toLocaleString("ko-KR")}</text>`; }
+    let ticks = ""; for (let i = 0; i <= YEARS; i += 2) ticks += `<text x="${x(i)}" y="${H - 8}" font-size="11" text-anchor="middle" fill="var(--ink-soft)">${i}년</text>`;
+    const last = data[data.length - 1];
+    $("chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="연차별 총자산과 원금 그래프">${grid}${ticks}
+      <path d="${line("contributed")}" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="${line("total")}" fill="none" stroke="var(--teal)" stroke-width="3"/>
+      <circle cx="${x(last.y)}" cy="${yv(last.total)}" r="4.5" fill="var(--teal)"/></svg>`;
+  }
+
+  // events
+  document.addEventListener("click", e => {
+    const t = e.target.closest("button"); if (!t) return;
+    if (t.dataset.break) breakDeposit(Number(t.dataset.break));
+    else if (t.dataset.cancel) cancelSaving(Number(t.dataset.cancel), false);
+    else if (t.dataset.buy) trade(t.dataset.buy, "buy");
+    else if (t.dataset.sell) trade(t.dataset.sell, "sell");
+    else if (t.dataset.bond) buyBond(t.dataset.bond);
+    else if (t.dataset.bsell) sellBond(Number(t.dataset.bsell));
+  });
+  $("depBtn").onclick = joinDeposit;
+  $("savBtn").onclick = joinSaving;
+  $("goBtn").onclick = advance;
+  $("newsOk").onclick = () => { $("dNews").close(); if (S.done) showEnd(); };
+  $("endClose").onclick = () => $("dEnd").close();
+  $("endAgain").onclick = () => { $("dEnd").close(); $("dStart").showModal(); };
+  $("rulesBtn").onclick = () => $("dStart").showModal();
+  $("startClose").onclick = () => $("dStart").close();
+  $("resetBtn").onclick = () => { if (confirm("처음부터 다시 할까요? 지금 기록은 사라져요.")) $("dStart").showModal(); };
+  $("startBtn").onclick = () => {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    if (!S.started || S.done || confirm("새 게임을 시작할까요? 지금 기록은 사라져요.")) { S = fresh(mode); S.started = true; uid = 1; }
+    $("dStart").close(); render();
+  };
+
+  meters($("mDep"), [["안전성", 5], ["수익성", 1], ["유동성", 2]]);
+  meters($("mSav"), [["안전성", 5], ["수익성", 2], ["유동성", 1]]);
+  meters($("mStock"), [["안전성", 1], ["수익성", 5], ["유동성", 4]]);
+  meters($("mBond"), [["안전성", 3], ["수익성", 3], ["유동성", 3]]);
+
+  if (!load()) { S = fresh("fixed"); render(); $("dStart").showModal(); }
+  else { render(); if (S.done) showEnd(); }
+})();
+</script>
+</body>
+</html>
